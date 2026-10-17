@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package xodus.playtime;
+
+message TitleStartedRequest {
+    uint32 title_id = 1;
+    uint64 xuid = 2;
+}
+
+message TitleStartedResponse {
+    uint32 session_id = 1;
+    PlaytimeError error = 2;
+}
+
+message TitleStoppedRequest {
+    uint32 session_id = 1;
+}
+
+message TitleStoppedResponse {
+    PlaytimeError error = 1;
+}
+
+message ListActiveSessionsRequest {}
+
+message ActiveSession {
+    uint32 session_id = 1;
+    uint32 title_id = 2;
+    uint64 xuid = 3;
+    int64 started_at = 4;
+    int64 last_heartbeat_at = 5;
+    bool last_heartbeat_ok = 6;
+}
+
+message ListActiveSessionsResponse {
+    repeated ActiveSession sessions = 1;
+}
+
+message GetPlaytimeRequest {
+    uint64 xuid = 1;
+    repeated uint32 title_ids = 2;
+}
+
+message TitlePlaytime {
+    uint32 title_id = 1;
+    uint32 minutes_played = 2;
+}
+
+message GetPlaytimeResponse {
+    repeated TitlePlaytime titles = 1;
+    PlaytimeError error = 2;
+}
+
+enum PlaytimeError {
+    PLAYTIME_ERROR_OK = 0;
+    PLAYTIME_ERROR_NOT_SIGNED_IN = 1;
+    PLAYTIME_ERROR_ALREADY_RUNNING = 2;
+    PLAYTIME_ERROR_UNKNOWN_SESSION = 3;
+    PLAYTIME_ERROR_UPSTREAM_FAILED = 4;
+    PLAYTIME_ERROR_INVALID_ARGUMENT = 5;
+}
+
+enum PlaytimeServiceMessage {
+    PLAYTIME_SERVICE_MESSAGE_UNDEFINED = 0;
+    PLAYTIME_SERVICE_MESSAGE_GET_PLAYTIME = 1;
+    PLAYTIME_SERVICE_MESSAGE_LIST_ACTIVE_SESSIONS = 2;
+    PLAYTIME_SERVICE_MESSAGE_TITLE_STARTED = 3;
+    PLAYTIME_SERVICE_MESSAGE_TITLE_STOPPED = 4;
+}
+
+service PlaytimeService {
+    rpc GetPlaytime(GetPlaytimeRequest) returns (GetPlaytimeResponse);
+    rpc ListActiveSessions(ListActiveSessionsRequest) returns (ListActiveSessionsResponse);
+    rpc TitleStarted(TitleStartedRequest) returns (TitleStartedResponse);
+    rpc TitleStopped(TitleStoppedRequest) returns (TitleStoppedResponse);
+}

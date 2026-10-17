@@ -1,3 +1,4 @@
+pub mod playtime;
 pub mod subscriptions;
 
 use serde::{Deserialize, Serialize};
