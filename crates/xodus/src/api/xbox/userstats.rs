@@ -1,13 +1,11 @@
-use crate::models::xbox::playtime::{ UserStatsBatchRequest, UserStatsBatchResponse, TitleName };
+use crate::models::xbox::playtime::{TitleName, UserStatsBatchRequest, UserStatsBatchResponse};
 
-pub async fn get_user_playtime (
+pub async fn get_user_playtime(
     client: &reqwest::Client,
     auth_header: &str,
     xuid: &str,
     title_ids: &[u32],
-
 ) -> reqwest::Result<UserStatsBatchResponse> {
-
     let body = UserStatsBatchRequest {
         arrange_by_field: "xuid".to_string(),
         xuids: vec![xuid.to_string()],

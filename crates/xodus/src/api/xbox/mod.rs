@@ -6,11 +6,9 @@ use crate::models::xbox::XstsResponse;
 pub mod auth;
 pub mod title;
 pub mod userstats;
-//pub mod presence;
 
 pub use auth::{authenticate_xbox_user, get_xsts_auth_header, request_xsts_token};
 pub use userstats::get_user_playtime;
-//pub use presence::get_user_presence;
 
 pub async fn run(
     client: &reqwest::Client,
