@@ -17,10 +17,9 @@ pub struct TitleName {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "lowercase")]
 pub struct UserStatsBatchResponse {
-    #[serde(rename = "statlistscollection")]
-    pub statlistscollection: Vec<StatlistCollection>,
+    pub stat_lists_collection: Vec<StatlistCollection>,
 }
 
 #[derive(Debug, Deserialize)]
