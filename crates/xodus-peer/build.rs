@@ -72,7 +72,7 @@ fn main() -> Result<()> {
             "./proto/xodus/download.proto",
             "./proto/xodus/common.proto",
             "./proto/xodus/stub.proto",
-            "./proto/xodus/playtime.proto",
+            "./proto/xodus/userstats.proto",
         ],
         &["./proto"],
     )?;

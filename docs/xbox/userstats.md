@@ -1,4 +1,4 @@
-## Format followed by get_playtime Request / Response
+## Format followed by get_userstats Request / Response
 
 POST https://userstats.xboxlive.com/batch HTTP/1.1
 REQUIRED HEADERS:

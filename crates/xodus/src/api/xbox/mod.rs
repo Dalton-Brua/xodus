@@ -8,7 +8,7 @@ pub mod title;
 pub mod userstats;
 
 pub use auth::{authenticate_xbox_user, get_xsts_auth_header, request_xsts_token};
-pub use userstats::get_user_playtime;
+pub use userstats::get_userstats;
 
 pub async fn run(
     client: &reqwest::Client,

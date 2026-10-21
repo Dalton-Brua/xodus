@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct UserStatsBatchRequest {
+pub struct UserstatsBatchRequest {
     #[serde(rename = "arrangebyfield")]
     pub arrange_by_field: String,
     pub xuids: Vec<String>,
@@ -18,8 +18,8 @@ pub struct TitleName {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
-pub struct UserStatsBatchResponse {
-    pub stat_lists_collection: Vec<StatlistCollection>,
+pub struct UserstatsBatchResponse {
+    pub statlistscollection: Vec<StatlistCollection>,
 }
 
 #[derive(Debug, Deserialize)]

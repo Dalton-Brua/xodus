@@ -2,21 +2,21 @@ use std::error::Error;
 
 use tokio::sync::OnceCell;
 
-use xodus_peer::proto::xodus::playtime::*;
+use xodus_peer::proto::xodus::userstats::*;
 
 use xodus::api::xbox::title::{get_endpoint, get_title_management};
-use xodus::api::xbox::userstats::get_user_playtime;
+use xodus::api::xbox::userstats::get_userstats;
 use xodus::api::xbox::{get_xsts_auth_header, run};
 use xodus::models::secrets::Token;
 use xodus::tokens::TokenManager;
 
-pub struct Playtime {
+pub struct Userstats {
     client: reqwest::Client,
     tokens: TokenManager,
     relying_party: OnceCell<String>,
 }
 
-impl Playtime {
+impl Userstats {
     pub fn new(client: &reqwest::Client, tokens: &TokenManager) -> Self {
         Self {
             client: client.clone(),
@@ -41,15 +41,15 @@ impl Playtime {
     }
 }
 
-impl PlaytimeService for Playtime {
-    async fn get_playtime(
+impl UserstatsService for Userstats {
+    async fn get_userstats(
         &self,
-        req: GetPlaytimeRequest,
-    ) -> Result<GetPlaytimeResponse, Box<dyn Error + Send + Sync>> {
+        req: GetUserstatsRequest,
+    ) -> Result<GetUserstatsResponse, Box<dyn Error + Send + Sync>> {
         if req.xuid == 0 {
-            return Ok(GetPlaytimeResponse {
+            return Ok(GetUserstatsResponse {
                 titles: Vec::new(),
-                error: PlaytimeError::NotSignedIn as i32,
+                error: UserstatsError::NotSignedIn as i32,
             });
         }
 
@@ -74,7 +74,7 @@ impl PlaytimeService for Playtime {
             }
         };
 
-        let parsed = get_user_playtime(
+        let parsed = get_userstats(
             &self.client,
             &get_xsts_auth_header(xsts_token),
             &req.xuid.to_string(),
@@ -87,7 +87,7 @@ impl PlaytimeService for Playtime {
             .into_iter()
             .flat_map(|collection| {
                 collection.stats.into_iter().filter_map(|stat| {
-                    Some(TitlePlaytime {
+                    Some(TitleStats {
                         title_id: stat.title_id.parse().ok()?,
                         minutes_played: stat.value.parse().ok()?,
                     })
@@ -95,9 +95,9 @@ impl PlaytimeService for Playtime {
             })
             .collect();
 
-        Ok(GetPlaytimeResponse {
+        Ok(GetUserstatsResponse {
             titles,
-            error: PlaytimeError::Ok as i32,
+            error: UserstatsError::Ok as i32,
         })
     }
 }
@@ -111,30 +111,30 @@ mod test {
         let client = reqwest::Client::new();
         let tokens = TokenManager::with_memory();
 
-        let svc = Playtime::new(&client, &tokens);
+        let svc = Userstats::new(&client, &tokens);
         let resp = svc
-            .get_playtime(GetPlaytimeRequest {
+            .get_userstats(GetUserstatsRequest {
                 xuid: 0,
                 title_ids: vec![1705097731],
             })
             .await
             .unwrap();
-        assert_eq!(resp.error, PlaytimeError::NotSignedIn as i32);
+        assert_eq!(resp.error, UserstatsError::NotSignedIn as i32);
         assert!(resp.titles.is_empty());
     }
 
     #[ignore]
     #[tokio::test]
-    async fn test_get_playtime() {
+    async fn test_get_userstats() {
         let client = reqwest::Client::new();
         xodus::secrets::init_secrets().expect("Unable to initialize credentials");
         let tokens = TokenManager::with_keychain_and_memory();
         xodus::tokens::device::ensure_device_credentials(&client, &tokens).await;
 
-        let svc = Playtime::new(&client, &tokens);
+        let svc = Userstats::new(&client, &tokens);
         let xuid = std::env::var("XUID").expect("set XUID").parse().unwrap();
         let resp = svc
-            .get_playtime(GetPlaytimeRequest {
+            .get_userstats(GetUserstatsRequest {
                 xuid,
                 title_ids: vec![1705097731, 1810111157],
             })
@@ -150,12 +150,12 @@ mod test {
         xodus::secrets::init_secrets().expect("Unable to initialize credentials");
         let tokens = TokenManager::with_keychain_and_memory();
         xodus::tokens::device::ensure_device_credentials(&client, &tokens).await;
-        let svc = Playtime::new(&client, &tokens);
+        let svc = Userstats::new(&client, &tokens);
         let rp = svc.get_relying_party().await.unwrap();
         assert!(tokens.get_cached_xsts(rp).is_none());
         let xuid = std::env::var("XUID").expect("set XUID").parse().unwrap();
         let resp = svc
-            .get_playtime(GetPlaytimeRequest {
+            .get_userstats(GetUserstatsRequest {
                 xuid,
                 title_ids: vec![1705097731],
             })
@@ -164,13 +164,13 @@ mod test {
         assert!(tokens.get_cached_xsts(rp).is_some());
         println!("{resp:?}");
         let resp = svc
-            .get_playtime(GetPlaytimeRequest {
+            .get_userstats(GetUserstatsRequest {
                 xuid,
                 title_ids: vec![1810111157],
             })
             .await
             .unwrap();
-        assert_eq!(resp.error, PlaytimeError::Ok as i32);
+        assert_eq!(resp.error, UserstatsError::Ok as i32);
         println!("{resp:?}");
     }
 }
