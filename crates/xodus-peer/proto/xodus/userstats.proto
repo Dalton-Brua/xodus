@@ -9,7 +9,14 @@ message GetUserstatsRequest {
 
 message TitleStats {
     uint32 title_id = 1;
-    uint32 minutes_played = 2;
+    repeated Stat stats = 2;
+}
+
+message Stat {
+    string name = 1;
+    string display_name = 2;
+    string stat_type = 3;
+    string value = 4;
 }
 
 message GetUserstatsResponse {
@@ -20,6 +27,7 @@ message GetUserstatsResponse {
 enum UserstatsError {
     USERSTATS_ERROR_OK = 0;
     USERSTATS_ERROR_NOT_SIGNED_IN = 1;
+    USERSTATS_ERROR_EMPTY_LIST = 2;
 }
 
 enum UserstatsServiceMessage {

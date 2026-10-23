@@ -7,13 +7,20 @@ pub async fn get_userstats(
     title_ids: &[u32],
 ) -> reqwest::Result<UserstatsBatchResponse> {
     let body = UserstatsBatchRequest {
+        groups: title_ids
+            .iter()
+            .map(|&title_id| TitleName {
+                name: "Hero".to_string(),
+                title_id: title_id.to_string(),
+            })
+            .collect(),
         arrange_by_field: "xuid".to_string(),
         xuids: vec![xuid.to_string()],
         stats: title_ids
             .iter()
-            .map(|&id| TitleName {
+            .map(|&title_id| TitleName {
                 name: "MinutesPlayed".to_string(),
-                title_id: id.to_string(),
+                title_id: title_id.to_string(),
             })
             .collect(),
     };
