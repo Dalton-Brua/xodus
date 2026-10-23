@@ -326,6 +326,5 @@ mod test {
         // Requested title with no stats still gets an entry (999999999)
         assert_eq!(titles.len(), 2);
         assert!(titles[1].stats.is_empty());
-
     }
 }
